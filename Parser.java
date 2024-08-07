@@ -29,6 +29,7 @@ public class Parser {
 
         // Recursive Descent Parser
         // Imprime si el input fue aceptado
+        boolean result = S();
         System.out.println("Aceptada? " + S());
 
         // Shunting Yard Algorithm
@@ -138,4 +139,79 @@ public class Parser {
     }
 
     /* TODO: sus otras funciones aqui */
+        private boolean nextTokenIs(int id) {
+        return this.next < this.tokens.size() && this.tokens.get(this.next).getId() == id;
+    }
+
+    // S ::= E;
+    private boolean S() {
+        return E() && term(Token.SEMI);
+    }
+
+    // E ::= A E'
+    private boolean E() {
+        return A() && EPrime();
+    }
+
+    // E' ::= + A E' | - A E' | ε
+    private boolean EPrime() {
+        if (nextTokenIs(Token.PLUS)) {
+            next++;
+            return A() && EPrime();
+        } else if (nextTokenIs(Token.LESS)) {
+            next++;
+            return A() && EPrime();
+        } else {
+            return true; // Épsilon
+        }
+    }
+
+    // A ::= B A'
+    private boolean A() {
+        return B() && APrime();
+    }
+
+    // A' ::= * B A' | / B A' | % B A' | ε
+    private boolean APrime() {
+        if (nextTokenIs(Token.MUL)) {
+            next++;
+            return B() && APrime();
+        } else if (nextTokenIs(Token.DIV)) {
+            next++;
+            return B() && APrime();
+        } else if (nextTokenIs(Token.MOD)) {
+            next++;
+            return B() && APrime();
+        } else {
+            return true; // Épsilon
+        }
+    }
+
+    //B ::= - B | ( E ) | number
+    private boolean B() {
+        if (nextTokenIs(Token.LESS)) {
+            next++;
+            return B();
+        } else if (nextTokenIs(Token.LEFT)) {
+            next++;
+            if (!E()) return false;
+            return term(Token.RIGHT);
+        } else {
+            return term(Token.NUMBER);
+        }
+    }
+
+    public static void main(String[] args) {
+        LinkedList<Token> tokens = new LinkedList<>();
+        tokens.add(new Token(Token.NUMBER, "2"));
+        tokens.add(new Token(Token.PLUS));
+        tokens.add(new Token(Token.NUMBER, "2"));
+        tokens.add(new Token(Token.SEMI));
+
+        Parser parser = new Parser();
+        boolean result = parser.parse(tokens);
+        System.out.println("Accepted? " + result);
+    }
 }
+
+    
