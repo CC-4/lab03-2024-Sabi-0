@@ -93,10 +93,7 @@ MOD = "%"
 EXP = "^"
 LEFT = "("
 RIGHT = ")"
-signo = [+-]
-digitos = [0-9]
-punto = .
-exponente = [eE]
+NUMBER = ({signo}?{digitos}+({punto}{digitos}*)?([eE]{signo}?{digitos}+)?)
 
 %%
 
@@ -116,13 +113,7 @@ exponente = [eE]
 
 <YYINITIAL>{RIGHT}  { return new Token(Token.SEMI);   }
 
-<YYINITIAL>{signo}  { return new Token(Token.SEMI);   }
-
-<YYINITIAL>{digitos}  { return new Token(Token.SEMI);   }
-
-<YYINITIAL>{punto}  { return new Token(Token.SEMI);   }
-
-<YYINITIAL>{exponente}  { return new Token(Token.SEMI);   }
+<YYINITIAL>{NUMBER}     { return new Token(Token.NUMBER, yytext()); }
 
 <YYINITIAL>{SEMI}   { return new Token(Token.SEMI);   }
 
